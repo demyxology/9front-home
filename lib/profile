@@ -1,0 +1,108 @@
+# env, -b so my things come first. allows for wrapper scripts
+bind -b $home/bin/rc /bin
+bind -b $home/bin/$cputype /bin
+bind -a /bin/ndb /bin
+bind -a /bin/ip /bin
+
+GOROOT=/sys/lib/go/amd64-1.22.3/
+
+# services
+webfs
+plumber
+if(! syscall create /tmp/xxx 1 0666 >[2]/dev/null)
+	ramfs	# in case we're running off a cd
+
+fn rip {
+    ip/ipconfig
+    cat /net/ndb
+}
+
+fn ndb {
+    cat /net/ndb
+}
+
+# Override cd to keep the prompt updated
+# must be a better way to do this
+prevdir=/usr/$user
+fn cd {
+    if(~ $(1) '-') { cd $prevdir }
+	if not { 
+	   if(! ~ $prevdir $*) prevdir=`{pwd}
+	   builtin cd $*
+	}
+}
+
+fn reacme {
+    acme -l $home/acme.dump
+}
+
+fn e {
+    acme $*
+}
+
+fn eprof {
+    acme $home/lib/profile
+}
+
+fn eterm {
+    acme $home/bin/rc/termstart
+}
+
+fn ecpu {
+    acme $home/bin/rc/cpustart
+}
+
+fn endb {
+    acme /lib/ndb/local
+}
+
+fn ld {
+    ls -F $* | grep / | mc
+}
+
+fn env {
+    for(var in /env/*){
+        echo $var '=' `{cat $var}
+    }
+}
+
+fn bins{ 
+    ls -F /bin* | grep $*
+}
+
+fn todo {
+    e $home/TODO
+}
+
+fn lextras {
+    9fs 9front
+    bind /n/9front /extras
+}
+
+font=/lib/font/bit/gomono/Go-Mono.14.font
+
+switch($service){
+case terminal
+	echo -n accelerated > '#m/mousectl'
+	echo -n 'res 3' > '#m/mousectl'
+	9fs esp
+	bind /n/esp esp
+	rio -i termstart -s
+case cpu
+	bind /mnt/term/dev/cons /dev/cons
+	bind -q /mnt/term/dev/consctl /dev/consctl
+	>[2] /dev/null {
+		cp /dev/sysname /mnt/term/dev/label
+		if(test -s /mnt/term/env/wsys)
+			wsys=/mnt/term^`{cat /mnt/term/env/wsys}
+	} 
+	bind -a /mnt/term/dev /dev
+	
+	# If we're connecting from a Mac, we're probably 
+	# on a retina display and need a bigger font to scale
+	if(ls /mnt/term | grep -s Volumes)
+	   font=/lib/font/bit/lucidasans/typeunicode.16.font
+	rio -i cpustart -s
+case con
+	prompt=('con% ' '	')
+}
