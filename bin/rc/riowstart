@@ -1,0 +1,2 @@
+#!/bin/rc
+</dev/kbdtap riow >/dev/kbdtap |[3] bar

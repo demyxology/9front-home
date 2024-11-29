@@ -1,0 +1,2 @@
+#!/bin/rc
+/$cputype/bin/acme -aib -c 1 $*

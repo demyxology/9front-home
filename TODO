@@ -1,0 +1,12 @@
+[ ] Set up ssh listener
+[?] Better prompt handling
+[ ] window snapping
+[ ] fix thinkpad buttons
+[ ] backup to git
+[ ] fix env to filter fns, etc. 
+[ ] clear function that scrolls the window
+[ ] read the source code commentary...
+
+useful links:
+http://thedaemon.space/plan9/9front.html
+http://thedaemon.space/plan9/9rc.html

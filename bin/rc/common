@@ -1,0 +1,13 @@
+#!/bin/rc
+
+window 0,0,161,200 stats -lmisce
+window 0,200,161,600 winwatch -e '^(winwatch|stats)'
+window -miny 130
+window riowstart
+
+GOROOT=/sys/lib/go/amd64-1.22.3
+
+# run a system shell on the serial console
+~ $#console 0 || window -scroll console
+
+

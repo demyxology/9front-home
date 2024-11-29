@@ -1,0 +1,3 @@
+#!/bin/rc
+echo 'key proto=dp9ik dom=9front user='$user' !password=BADBADDIE' >/mnt/factotum/ctl
+aux/listen1 -t 'tcp!*!rcpu' /rc/bin/service/tcp17019

@@ -1,0 +1,20 @@
+# to update: cp /usr/glenda/lib/plumbing /mnt/plumb/rules
+
+editor = acme
+browser = netsurf
+
+type   is     text
+data   matches       'https://(www.)?youtube[^ ]+'
+plumb  start  window youtube ''''$0''''
+
+include basic
+
+src is vdir
+type is text
+arg isdir $data
+plumb start window -cd $data rc
+
+type is text
+arg isdir $data
+plumb to vdir
+plumb client window vdir

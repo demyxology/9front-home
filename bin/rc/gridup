@@ -1,0 +1,43 @@
+#!/bin/rc
+
+# 9p.zone domain is gone
+#srv tcp!registry.9p.zone!6675 registry /n/registry
+#srv -c tcp!9p.zone!9991 9p.zone.disk /n/disk
+
+srv tcp!chat.only9fans.com!9990 chat.only9fans.com /n/9chat
+
+fn clean {
+	echo $1 | sed 's/.*!([^!]+)!.*/\1/'
+}
+
+for(s in /n/registry/tcp*){
+	s=`{basename $s}
+	srv $s `{clean $s} /n/^`{clean $s} &
+}
+
+>/tmp/chatcat cat <<'...'
+#!/bin/rc
+chan=$1
+label $chan
+echo JOIN $nick to chat >>/n/9chat/$chan
+cat /n/9chat/$chan &
+while() cat | sed '1s/^/'$nick' → /' >>/n/9chat/$chan
+...
+chmod +x /tmp/chatcat
+
+>/tmp/gridrio cat <<'...'
+#!/bin/rc
+for(c in chat commits noise)
+	window -scroll /tmp/chatcat $c
+...
+chmod +x /tmp/gridrio
+
+echo '	Type a (multi-line) message ending with a newline'
+echo '	and press control-d (EOT) to send.'
+echo
+echo -n 'Please enter nickname to use, finish with ENTER: '
+nick=`{read}
+if(~ $#nick 0)
+	nick=$user
+
+exec rio -s -i /tmp/gridrio

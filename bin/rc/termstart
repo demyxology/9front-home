@@ -1,0 +1,6 @@
+#!/bin/rc
+
+. $home/bin/rc/common
+
+window -hide listener
+window -hide cat /dev/kprint
