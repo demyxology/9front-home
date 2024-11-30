@@ -9,6 +9,8 @@ GOROOT=/sys/lib/go/amd64-1.22.3/
 # services
 webfs
 plumber
+
+rm -rf /tmp/* 
 if(! syscall create /tmp/xxx 1 0666 >[2]/dev/null)
 	ramfs	# in case we're running off a cd
 
