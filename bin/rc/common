@@ -1,13 +1,27 @@
 #!/bin/rc
 
-window 0,0,161,200 stats -lmisce
-window 0,200,161,600 winwatch -e '^(winwatch|stats)'
-window -miny 130
-window riowstart
+screen=`{read -c 60 < /dev/screen}
+screenx=$screen(4)
+screeny=$screen(5)
+factor=`{echo '(' ^ $screenx ^ '*' ^ $screeny ^ ') / (1920 * 1080)' | bc}
+if(~ $factor 0) factor = 1
+fn scale {
+    for(num in $*)
+        echo $factor ^ '*' ^ $num | bc
+}
+fn offsetx {
+    echo $screenx ^ '-' ^ $* | bc
+}
+fn offsety {
+    echo $screeny ^ '-' ^ $* | bc
+}
 
-GOROOT=/sys/lib/go/amd64-1.22.3
+window -r `{scale (5 5 161 200)} stats -lmisce
+window -r `{scale (5 205 161 400)} winwatch
+window -miny 130
+window -r `{scale (5 405 200 600)} rc -c 'noscroll; while(){ >/dev/text; weather; cal | sed -e :a -e ''/^\n*$/{$d;N;};/\n$/ba''; echo `{date -f ''WW DD''} ''    '' `{date -f ''hh:mm a''}; sleep 30 }'
+#window riowstart
+
 
 # run a system shell on the serial console
 ~ $#console 0 || window -scroll console
-
-

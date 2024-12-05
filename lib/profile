@@ -4,15 +4,14 @@ bind -b $home/bin/$cputype /bin
 bind -a /bin/ndb /bin
 bind -a /bin/ip /bin
 
-GOROOT=/sys/lib/go/amd64-1.22.3/
+GOROOT=/sys/lib/go/amd64-1.23.3/
 
 # services
 webfs
 plumber
 
 rm -rf /tmp/* 
-if(! syscall create /tmp/xxx 1 0666 >[2]/dev/null)
-	ramfs	# in case we're running off a cd
+ramfs -u
 
 fn rip {
     ip/ipconfig
@@ -23,8 +22,6 @@ fn ndb {
     cat /net/ndb
 }
 
-# Override cd to keep the prompt updated
-# must be a better way to do this
 prevdir=/usr/$user
 fn cd {
     if(~ $(1) '-') { cd $prevdir }
@@ -89,7 +86,7 @@ case terminal
 	echo -n 'res 3' > '#m/mousectl'
 	9fs esp
 	bind /n/esp esp
-	rio -i termstart -s
+	lola -i termstart -s
 case cpu
 	bind /mnt/term/dev/cons /dev/cons
 	bind -q /mnt/term/dev/consctl /dev/consctl
@@ -100,11 +97,20 @@ case cpu
 	} 
 	bind -a /mnt/term/dev /dev
 	
-	# If we're connecting from a Mac, we're probably 
-	# on a retina display and need a bigger font to scale
-	if(ls /mnt/term | grep -s Volumes)
+	# Set custom options based off crude OS fingerprinting
+	if(ls /mnt/term | grep -s Volumes){
+	   # macos: retina display means we need a bigger font
 	   font=/lib/font/bit/lucidasans/typeunicode.16.font
-	rio -i cpustart -s
+	}
+    if not if(ls /mnt/term | grep -s C:){
+        # Windows
+    }
+	if not{
+	   # *nix: we probably have fuse to mount 9's fs on the client
+	   $home/bin/rc/p9fs
+	}
+	
+	lola -i cpustart -s
 case con
 	prompt=('con% ' '	')
 }
